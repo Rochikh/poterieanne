@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#B8754A">
+<title>Atelier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDE7DF; --surface:#F6F2EB; --ink:#3A2E26; --muted:#8A7C6F;
+  --clay:#B8754A; --sage:#8A9479; --glaze:#5B7A8C; --line:#Dcd3c6;
+  --serif:'Fraunces',Georgia,serif; --sans:'DM Sans',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-text-size-adjust:100%}
+body{padding-bottom:90px}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea,select{font-family:inherit;font-size:16px;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 5px 2px;text-transform:uppercase;letter-spacing:.04em}
+.field{margin-bottom:14px}
+
+/* header */
+header{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--line);padding:14px 18px calc(14px + env(safe-area-inset-top));padding-top:calc(14px + env(safe-area-inset-top))}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:26px;height:26px;border-radius:50%;border:2.5px solid var(--clay);position:relative;flex:none}
+.mark::after{content:"";position:absolute;inset:5px;border-radius:50%;border:1.5px solid var(--sage)}
+.brand h1{font-family:var(--serif);font-weight:500;font-size:22px;letter-spacing:.01em}
+.mode{margin-left:auto;display:flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px}
+.mode button{font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;color:var(--muted)}
+.mode button.on{background:var(--ink);color:var(--surface)}
+
+main{padding:18px 18px 0;max-width:760px;margin:0 auto}
+
+/* collections */
+.coltitle{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--clay);letter-spacing:.02em;margin:24px 2px 12px;display:flex;align-items:baseline;gap:8px}
+.coltitle .n{font-family:var(--sans);font-size:12px;color:var(--muted);font-weight:500}
+.coltitle:first-child{margin-top:6px}
+
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;text-align:left;display:flex;flex-direction:column}
+.thumb{aspect-ratio:1;background:var(--line) center/cover no-repeat;position:relative}
+.thumb .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:30px;font-family:var(--serif)}
+.badge{position:absolute;left:8px;top:8px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:999px;background:rgba(58,46,38,.82);color:var(--surface);text-transform:uppercase;letter-spacing:.04em}
+.card .meta{padding:10px 11px 12px}
+.card .t{font-family:var(--serif);font-size:16px;font-weight:500;line-height:1.15}
+.card .s{font-size:12px;color:var(--muted);margin-top:3px}
+
+.empty{text-align:center;color:var(--muted);padding:60px 20px;font-size:15px;line-height:1.5}
+.empty .mark{margin:0 auto 16px;width:40px;height:40px}
+
+/* fab */
+.fab{position:fixed;right:20px;bottom:calc(22px + env(safe-area-inset-bottom));z-index:40;width:60px;height:60px;border-radius:50%;background:var(--clay);color:#fff;font-size:30px;box-shadow:0 6px 20px rgba(184,117,74,.4);display:flex;align-items:center;justify-content:center;line-height:1}
+.tools{position:fixed;left:18px;bottom:calc(26px + env(safe-area-inset-bottom));z-index:40;display:flex;gap:8px}
+.tools button{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:9px 14px;font-size:12px;font-weight:600;color:var(--muted)}
+
+/* sheet / detail */
+.scrim{position:fixed;inset:0;z-index:50;background:rgba(40,32,26,.5);display:none}
+.scrim.show{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:51;background:var(--bg);border-radius:20px 20px 0 0;max-height:94vh;overflow-y:auto;transform:translateY(100%);transition:transform .28s cubic-bezier(.2,.7,.2,1);padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+.sheet.show{transform:translateY(0)}
+.shbar{position:sticky;top:0;background:var(--bg);display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);z-index:2}
+.shbar h2{font-family:var(--serif);font-weight:500;font-size:18px}
+.shbar .x{margin-left:auto;font-size:22px;color:var(--muted);width:34px;height:34px;border-radius:50%}
+.sbody{padding:18px}
+
+/* detail view */
+.hero{width:100%;aspect-ratio:4/5;background:var(--line) center/cover;border-radius:14px}
+.hero.ph{display:flex;align-items:center;justify-content:center;color:var(--muted);font-family:var(--serif);font-size:40px}
+.shots{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:2px}
+.shots img{height:60px;width:60px;object-fit:cover;border-radius:9px;flex:none;border:1px solid var(--line)}
+.dtitle{font-family:var(--serif);font-size:28px;font-weight:500;margin:18px 0 2px;line-height:1.1}
+.dsub{color:var(--clay);font-size:13px;font-weight:600;letter-spacing:.02em}
+.specs{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0}
+.spec{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:7px 11px;font-size:13px}
+.spec b{color:var(--muted);font-weight:600}
+.desc{font-size:16px;line-height:1.55;margin:6px 0 4px}
+.note{background:#efe7da;border-left:3px solid var(--sage);border-radius:0 10px 10px 0;padding:13px 14px;margin-top:16px;font-size:14px;line-height:1.5}
+.note .lab{font-size:11px;font-weight:600;color:var(--sage);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.editbtn{margin-top:20px;width:100%;background:var(--ink);color:var(--surface);padding:13px;border-radius:11px;font-weight:600;font-size:15px}
+
+/* form */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.shots-edit{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.shots-edit .pic{position:relative;width:70px;height:70px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.shots-edit .pic img{width:100%;height:100%;object-fit:cover}
+.shots-edit .pic .del{position:absolute;top:2px;right:2px;background:rgba(40,32,26,.8);color:#fff;width:20px;height:20px;border-radius:50%;font-size:13px;line-height:20px;text-align:center}
+.addpic{width:70px;height:70px;border:1.5px dashed var(--clay);border-radius:10px;color:var(--clay);font-size:24px;display:flex;align-items:center;justify-content:center}
+.save{width:100%;background:var(--clay);color:#fff;padding:14px;border-radius:12px;font-weight:600;font-size:16px;margin-top:8px}
+.delete{width:100%;color:#a8453a;padding:12px;font-weight:600;font-size:14px;margin-top:6px}
+.hint{font-size:12px;color:var(--muted);margin:-8px 2px 14px}
+[hidden]{display:none!important}
+@media(prefers-reduced-motion:reduce){.sheet{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="mark"></div>
+    <h1>Atelier</h1>
+    <div class="mode">
+      <button id="mAtelier" class="on">Atelier</button>
+      <button id="mShow">Présentation</button>
+    </div>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<div class="tools" id="tools">
+  <button id="exportBtn">Sauvegarde</button>
+  <button id="importBtn">Restaurer</button>
+  <input type="file" id="importFile" accept="application/json" hidden>
+</div>
+<button class="fab" id="addBtn" aria-label="Ajouter une pièce">+</button>
+
+<!-- Detail / Form sheet -->
+<div class="scrim" id="scrim"></div>
+<section class="sheet" id="sheet" aria-hidden="true">
+  <div class="shbar"><h2 id="shTitle">Pièce</h2><button class="x" id="closeSheet" aria-label="Fermer">×</button></div>
+  <div class="sbody" id="sbody"></div>
+</section>
+
+<script>
+const TYPES=["Bol","Tasse","Mug","Vase","Assiette","Coupe","Pichet","Pièce libre"];
+const TECH=["Tournage","Modelage","Plaque","Colombin","Mixte"];
+const TERRE=["Grès","Faïence","Porcelaine","Terre rouge","Inconnue"];
+const ETAT=["Cru","Séché","Biscuité","Émaillé","Cuit"];
+const ETATCOLOR={Cru:"#a98c6a",Séché:"#9c7b52",Biscuité:"#b8754a",Émaillé:"#5B7A8C",Cuit:"#7a5c3a"};
+
+let DB=load();
+let mode="atelier"; // atelier | show
+let editingId=null;
+
+function load(){try{return JSON.parse(localStorage.getItem("atelier")||"")||seed()}catch(e){return seed()}}
+function seed(){return {pieces:[]}}
+function save(){localStorage.setItem("atelier",JSON.stringify(DB))}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+
+/* ---------- image resize ---------- */
+function resize(file,max=1100,q=.78){return new Promise(res=>{
+  const img=new Image();const fr=new FileReader();
+  fr.onload=()=>{img.onload=()=>{
+    let{width:w,height:h}=img;
+    if(w>h&&w>max){h=h*max/w;w=max}else if(h>=w&&h>max){w=w*max/h;h=max}
+    const c=document.createElement("canvas");c.width=w;c.height=h;
+    c.getContext("2d").drawImage(img,0,0,w,h);
+    res(c.toDataURL("image/jpeg",q));
+  };img.src=fr.result;};
+  fr.readAsDataURL(file);
+})}
+
+/* ---------- render gallery ---------- */
+function collections(){
+  const map={};
+  DB.pieces.forEach(p=>{const k=p.collection?.trim()||"Sans série";(map[k]=map[k]||[]).push(p)});
+  return Object.entries(map).sort((a,b)=>a[0]==="Sans série"?1:b[0]==="Sans série"?-1:a[0].localeCompare(b[0]));
+}
+function render(){
+  const m=document.getElementById("main");
+  if(!DB.pieces.length){
+    m.innerHTML=`<div class="empty"><div class="mark"></div>Aucune pièce pour l'instant.<br>Touchez « + » pour photographier la première.</div>`;
+    return;
+  }
+  let html="";
+  collections().forEach(([col,arr])=>{
+    arr.sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+    html+=`<div class="coltitle">${esc(col)} <span class="n">${arr.length} pièce${arr.length>1?"s":""}</span></div><div class="grid">`;
+    arr.forEach(p=>{
+      const cover=p.photos&&p.photos[0];
+      html+=`<button class="card" data-id="${p.id}">
+        <div class="thumb" ${cover?`style="background-image:url('${cover}')"`:""}>
+          ${cover?"":'<div class="ph">◔</div>'}
+          ${p.etat?`<span class="badge" style="background:${ETATCOLOR[p.etat]||"#3A2E26"}">${p.etat}</span>`:""}
+        </div>
+        <div class="meta"><div class="t">${esc(p.title||"Sans titre")}</div>
+        <div class="s">${[p.type,p.terre].filter(Boolean).join(" · ")||"&nbsp;"}</div></div>
+      </button>`;
+    });
+    html+=`</div>`;
+  });
+  m.innerHTML=html;
+  m.querySelectorAll(".card").forEach(c=>c.onclick=()=>openDetail(c.dataset.id));
+}
+function esc(s){return(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+/* ---------- detail ---------- */
+function openDetail(id){
+  const p=DB.pieces.find(x=>x.id===id);if(!p)return;
+  document.getElementById("shTitle").textContent=p.collection||"Pièce";
+  const photos=p.photos||[];
+  const cover=photos[0];
+  const specs=[["Type",p.type],["Technique",p.tech],["Terre",p.terre],["État",p.etat],["Dimensions",p.dims],["Date",fmtDate(p.date)]]
+    .filter(s=>s[1]).map(s=>`<div class="spec"><b>${s[0]}</b> ${esc(s[1])}</div>`).join("");
+  const privateNote=(mode==="atelier"&&p.notes)?`<div class="note"><div class="lab">Notes d'atelier (privées)</div>${esc(p.notes).replace(/\n/g,"<br>")}</div>`:"";
+  document.getElementById("sbody").innerHTML=`
+    <div class="hero ${cover?"":"ph"}" ${cover?`style="background-image:url('${cover}')"`:""}>${cover?"":"◔"}</div>
+    ${photos.length>1?`<div class="shots">${photos.map(s=>`<img src="${s}">`).join("")}</div>`:""}
+    <div class="dtitle">${esc(p.title||"Sans titre")}</div>
+    ${p.collection?`<div class="dsub">${esc(p.collection)}</div>`:""}
+    ${specs?`<div class="specs">${specs}</div>`:""}
+    ${p.desc?`<p class="desc">${esc(p.desc).replace(/\n/g,"<br>")}</p>`:""}
+    ${privateNote}
+    ${mode==="atelier"?`<button class="editbtn" id="edit">Modifier</button>`:""}`;
+  if(mode==="atelier")document.getElementById("edit").onclick=()=>openForm(p.id);
+  showSheet();
+}
+function fmtDate(d){if(!d)return"";const[y,m]=d.split("-");const mo=["jan","fév","mar","avr","mai","juin","juil","août","sep","oct","nov","déc"];return m?`${mo[+m-1]} ${y}`:y}
+
+/* ---------- form ---------- */
+function openForm(id){
+  editingId=id;
+  const p=id?DB.pieces.find(x=>x.id===id):{photos:[]};
+  const known=[...new Set(DB.pieces.map(x=>x.collection).filter(Boolean))];
+  document.getElementById("shTitle").textContent=id?"Modifier":"Nouvelle pièce";
+  const opt=(arr,v)=>arr.map(o=>`<option ${o===v?"selected":""}>${o}</option>`).join("");
+  document.getElementById("sbody").innerHTML=`
+    <div class="field"><label>Photos</label>
+      <div class="shots-edit" id="picRow"></div>
+      <input type="file" id="picInput" accept="image/*" capture="environment" multiple hidden>
+    </div>
+    <div class="field"><label>Titre</label><input id="f_title" value="${esc(p.title||"")}" placeholder="ex. Bol côtelé"></div>
+    <div class="field"><label>Série / collection</label>
+      <input id="f_col" list="cols" value="${esc(p.collection||"")}" placeholder="ex. Série bols d'hiver">
+      <datalist id="cols">${known.map(c=>`<option value="${esc(c)}">`).join("")}</datalist>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Type</label><select id="f_type"><option value=""></option>${opt(TYPES,p.type)}</select></div>
+      <div class="field"><label>État</label><select id="f_etat"><option value=""></option>${opt(ETAT,p.etat)}</select></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Technique</label><select id="f_tech"><option value=""></option>${opt(TECH,p.tech)}</select></div>
+      <div class="field"><label>Terre</label><select id="f_terre"><option value=""></option>${opt(TERRE,p.terre)}</select></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Dimensions</label><input id="f_dims" value="${esc(p.dims||"")}" placeholder="h.8 ø12 cm"></div>
+      <div class="field"><label>Date</label><input id="f_date" type="month" value="${esc(p.date||"")}"></div>
+    </div>
+    <div class="field"><label>Description (visible)</label><textarea id="f_desc" rows="3" placeholder="Ce que les visiteurs liront">${esc(p.desc||"")}</textarea></div>
+    <div class="field"><label>Notes d'atelier (privées)</label><textarea id="f_notes" rows="3" placeholder="Pour toi : intention, ratés, à refaire…">${esc(p.notes||"")}</textarea>
+      <div class="hint">Jamais affichées en mode Présentation.</div></div>
+    <button class="save" id="saveBtn">${id?"Enregistrer":"Ajouter la pièce"}</button>
+    ${id?`<button class="delete" id="delBtn">Supprimer cette pièce</button>`:""}`;
+
+  let photos=[...(p.photos||[])];
+  const picRow=document.getElementById("picRow");
+  const drawPics=()=>{
+    picRow.innerHTML=photos.map((s,i)=>`<div class="pic"><img src="${s}"><span class="del" data-i="${i}">×</span></div>`).join("")
+      +`<button class="addpic" id="addPic">+</button>`;
+    picRow.querySelectorAll(".del").forEach(d=>d.onclick=()=>{photos.splice(+d.dataset.i,1);drawPics()});
+    document.getElementById("addPic").onclick=()=>document.getElementById("picInput").click();
+  };
+  drawPics();
+  document.getElementById("picInput").onchange=async e=>{
+    for(const f of e.target.files){photos.push(await resize(f))}
+    e.target.value="";drawPics();
+  };
+  document.getElementById("saveBtn").onclick=()=>{
+    const v=i=>document.getElementById(i).value.trim();
+    const rec={id:id||uid(),photos,title:v("f_title"),collection:v("f_col"),type:v("f_type"),
+      etat:v("f_etat"),tech:v("f_tech"),terre:v("f_terre"),dims:v("f_dims"),date:v("f_date"),
+      desc:document.getElementById("f_desc").value.trim(),notes:document.getElementById("f_notes").value.trim()};
+    if(id){const ix=DB.pieces.findIndex(x=>x.id===id);DB.pieces[ix]=rec}else{DB.pieces.push(rec)}
+    save();render();hideSheet();
+  };
+  if(id)document.getElementById("delBtn").onclick=()=>{
+    if(confirm("Supprimer cette pièce ?")){DB.pieces=DB.pieces.filter(x=>x.id!==id);save();render();hideSheet()}
+  };
+  showSheet();
+}
+
+/* ---------- sheet plumbing ---------- */
+function showSheet(){document.getElementById("scrim").classList.add("show");const s=document.getElementById("sheet");s.classList.add("show");s.setAttribute("aria-hidden","false")}
+function hideSheet(){document.getElementById("scrim").classList.remove("show");const s=document.getElementById("sheet");s.classList.remove("show");s.setAttribute("aria-hidden","true")}
+document.getElementById("closeSheet").onclick=hideSheet;
+document.getElementById("scrim").onclick=hideSheet;
+
+/* ---------- mode ---------- */
+function setMode(m){
+  mode=m;
+  document.getElementById("mAtelier").classList.toggle("on",m==="atelier");
+  document.getElementById("mShow").classList.toggle("on",m==="show");
+  document.getElementById("addBtn").hidden=(m==="show");
+  document.getElementById("tools").hidden=(m==="show");
+  hideSheet();render();
+}
+document.getElementById("mAtelier").onclick=()=>setMode("atelier");
+document.getElementById("mShow").onclick=()=>setMode("show");
+document.getElementById("addBtn").onclick=()=>openForm(null);
+
+/* ---------- backup ---------- */
+document.getElementById("exportBtn").onclick=()=>{
+  const blob=new Blob([JSON.stringify(DB)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="atelier-"+new Date().toISOString().slice(0,10)+".json";a.click();
+};
+document.getElementById("importBtn").onclick=()=>document.getElementById("importFile").click();
+document.getElementById("importFile").onchange=e=>{
+  const fr=new FileReader();fr.onload=()=>{try{const d=JSON.parse(fr.result);if(d.pieces){DB=d;save();render();alert("Sauvegarde restaurée.")}}catch(x){alert("Fichier illisible.")}};
+  fr.readAsText(e.target.files[0]);
+};
+
+render();
+</script>
+</body>
+</html>
