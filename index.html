@@ -104,6 +104,16 @@ main{padding:18px 18px 0;max-width:760px;margin:0 auto}
 .delete{width:100%;color:#a8453a;padding:12px;font-weight:600;font-size:14px;margin-top:6px}
 .hint{font-size:12px;color:var(--muted);margin:-8px 2px 14px}
 .sectsep{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--clay);margin:20px 0 12px;padding-top:16px;border-top:1px solid var(--line)}
+.tip{display:block;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--sage);border-radius:14px;padding:14px 16px;margin:6px 2px 2px}
+.tip .k{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--sage);margin-bottom:4px}
+.tip .t{font-family:var(--serif);font-size:17px;font-weight:500;line-height:1.2}
+.tip .d{font-size:13px;color:var(--muted);margin-top:5px;line-height:1.45}
+.tip .more{font-size:12px;font-weight:600;color:var(--clay);margin-top:8px;display:inline-block}
+.cv-theme{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--clay);margin:18px 0 8px;padding-top:14px;border-top:1px solid var(--line)}
+.cv-theme:first-child{border-top:none;padding-top:0;margin-top:4px}
+.cv-item{margin-bottom:14px}
+.cv-item .ct{font-weight:600;font-size:15px;margin-bottom:3px}
+.cv-item .cd{font-size:14px;line-height:1.5;color:var(--ink)}
 [hidden]{display:none!important}
 @media(prefers-reduced-motion:reduce){.sheet{transition:none}}
 </style>
@@ -141,6 +151,37 @@ const TECH=["Tournage","Modelage","Plaque","Colombin","Mixte"];
 const TERRE=["Grès","Faïence","Porcelaine","Terre rouge","Inconnue"];
 const ETAT=["Cru","Séché","Biscuité","Émaillé","Cuit"];
 const ETATCOLOR={Cru:"#a98c6a",Séché:"#9c7b52",Biscuité:"#b8754a",Émaillé:"#5B7A8C",Cuit:"#7a5c3a"};
+const CONSEILS=[
+  {theme:"Centrage",items:[
+    {t:"Cale tes coudes",d:"Pose les coudes sur les cuisses ou contre le corps. Le centrage vient du corps, pas de la force des bras."},
+    {t:"Terre bien malaxée",d:"Une terre homogène, sans bulle, se centre dix fois plus vite. Malaxe en coquille ou en tête de bélier avant de monter sur le tour."},
+    {t:"Mouille peu, mouille souvent",d:"Trop d'eau ramollit la paroi et fait perdre le centrage. De l'eau régulièrement, en petite quantité."}
+  ]},
+  {theme:"Montée des parois",items:[
+    {t:"Compresse le fond",d:"Avant de monter les parois, presse bien le fond avec les doigts ou une estèque. Ça évite la fissure en S au séchage."},
+    {t:"Monte lentement",d:"Une seule pression continue par passage, du bas vers le haut, sans à-coups. La précipitation creuse des creux irréguliers."},
+    {t:"Garde une lèvre épaisse",d:"Laisse la lèvre plus épaisse que la paroi tant que tu montes, tu la finis à la fin. Une lèvre fine trop tôt déchire."}
+  ]},
+  {theme:"Séchage et fissures",items:[
+    {t:"Sèche sous plastique",d:"Couvre les pièces d'un film léger les premiers jours. Un séchage lent et régulier évite les fendillements."},
+    {t:"Sèche à l'envers",d:"Retourne bols et tasses pour que le pied et la lèvre sèchent à la même vitesse."},
+    {t:"Dur comme du cuir",d:"Le tournassage et la pose d'anse se font quand la terre est dure comme du cuir, pas avant, pas après."}
+  ]},
+  {theme:"Tournassage",items:[
+    {t:"Recentre bien",d:"Une pièce mal recentrée sur le tour se tournasse de travers et finit par percer. Prends le temps de la recaler."},
+    {t:"Outil affûté",d:"Une mirette qui coupe net laisse une surface propre et soulève moins de barbes."}
+  ]},
+  {theme:"Émaillage",items:[
+    {t:"Tesson d'abord",d:"Teste chaque émail sur un tesson de la même terre avant la vraie pièce. Note la terre, le nombre de couches, le résultat."},
+    {t:"Couche régulière",d:"Trop épais, l'émail coule à la cuisson. Trop fin, il reste mat. Vise une épaisseur de carte à jouer, régulière."},
+    {t:"Pied propre",d:"Essuie l'émail sous le pied avant cuisson, sinon la pièce colle à la plaque du four."}
+  ]},
+  {theme:"Cuisson grès et faïence",items:[
+    {t:"Deux familles, deux températures",d:"La faïence cuit en basse température (autour de 1000 à 1080°C), le grès en haute température (autour de 1200 à 1280°C). Ton prestataire fixe le cône exact."},
+    {t:"Bien sec avant le biscuit",d:"Une pièce encore humide peut éclater au premier feu. Attends le séchage complet, terre claire et froide au toucher."},
+    {t:"Note ce qui part au four",d:"Avant de confier une fournée, photographie et note chaque pièce avec sa terre et son émail. Au retour, tu sais quoi reproduire."}
+  ]}
+];
 
 let DB=load();
 let mode="atelier";
@@ -185,10 +226,11 @@ function collections(){
 }
 function render(){
   const m=document.getElementById("main");
+  const banner=mode==="atelier"?tipHTML():"";
   if(!DB.pieces.length){
-    m.innerHTML=`<div class="empty"><div class="mark"></div>Aucune pièce pour l'instant.<br>Touchez « + » pour photographier la première.</div>`;return;
+    m.innerHTML=banner+`<div class="empty"><div class="mark"></div>Aucune pièce pour l'instant.<br>Touchez « + » pour photographier la première.</div>`;wireTip();return;
   }
-  let html="";
+  let html=banner;
   collections().forEach(([col,arr])=>{
     arr.sort((a,b)=>(current(b).date||"").localeCompare(current(a).date||""));
     html+=`<div class="coltitle">${esc(col)} <span class="n">${arr.length} pièce${arr.length>1?"s":""}</span></div><div class="grid">`;
@@ -208,6 +250,7 @@ function render(){
   });
   m.innerHTML=html;
   m.querySelectorAll(".card").forEach(c=>c.onclick=()=>openDetail(c.dataset.id));
+  wireTip();
 }
 
 /* detail with progression timeline */
@@ -338,6 +381,29 @@ function openStageForm(pieceId,stageId){
     if(p.stages.length<=1){alert("Une pièce garde au moins une étape.");return;}
     if(confirm("Supprimer cette étape ?")){p.stages=p.stages.filter(s=>s.id!==stageId);save();render();openDetail(pieceId)}
   };
+  showSheet();
+}
+
+/* conseils : astuce du jour + bibliothèque */
+function flatConseils(){const a=[];CONSEILS.forEach(c=>c.items.forEach(it=>a.push({theme:c.theme,t:it.t,d:it.d})));return a;}
+function tipHTML(){
+  const flat=flatConseils();
+  const now=new Date();const day=Math.floor((now-new Date(now.getFullYear(),0,0))/86400000);
+  const t=flat[day%flat.length];
+  return`<button class="tip" id="tipCard">
+    <div class="k">Astuce du jour · ${esc(t.theme)}</div>
+    <div class="t">${esc(t.t)}</div>
+    <div class="d">${esc(t.d)}</div>
+    <div class="more">Voir tous les conseils</div>
+  </button>`;
+}
+function wireTip(){const c=document.getElementById("tipCard");if(c)c.onclick=openConseils;}
+function openConseils(){
+  document.getElementById("shTitle").textContent="Conseils";
+  document.getElementById("sbody").innerHTML=CONSEILS.map(c=>
+    `<div class="cv-theme">${esc(c.theme)}</div>`+
+    c.items.map(it=>`<div class="cv-item"><div class="ct">${esc(it.t)}</div><div class="cd">${esc(it.d)}</div></div>`).join("")
+  ).join("");
   showSheet();
 }
 
