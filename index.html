@@ -173,12 +173,24 @@ const CONSEILS=[
   ]},
   {theme:"Émaillage",items:[
     {t:"Tesson d'abord",d:"Teste chaque émail sur un tesson de la même terre avant la vraie pièce. Note la terre, le nombre de couches, le résultat."},
+    {t:"Biscuit dépoussiéré",d:"Avant d'émailler, passe une éponge à peine humide ou souffle la poussière. La poussière laisse des trous dans l'émail cuit."},
+    {t:"Biscuit sec et froid",d:"Émaille sur un biscuit à température ambiante. Trop humide ou tiède, l'émail accroche mal et goutte."},
     {t:"Couche régulière",d:"Trop épais, l'émail coule à la cuisson. Trop fin, il reste mat. Vise une épaisseur de carte à jouer, régulière."},
-    {t:"Pied propre",d:"Essuie l'émail sous le pied avant cuisson, sinon la pièce colle à la plaque du four."}
+    {t:"Compte les secondes",d:"Au trempage, compte le temps (par exemple trois secondes) et garde le même sur toute une série. C'est ce qui rend l'épaisseur constante."},
+    {t:"Marge au-dessus du pied",d:"Laisse un à deux centimètres sans émail au bas de la pièce. À la cuisson l'émail descend, cette marge évite qu'il touche la plaque."},
+    {t:"Pied propre",d:"Essuie l'émail sous le pied avant cuisson, sinon la pièce colle à la plaque du four et peut être refusée par ton prestataire."},
+    {t:"Si ça craquelle",d:"De fines craquelures après cuisson (le tressaillage) veulent dire un émail trop tendu pour la terre. Émail plus fin, autre accord terre-émail, ou refroidissement plus lent."},
+    {t:"Si l'émail manque par plaques",d:"L'émail qui se rétracte et laisse la terre nue vient presque toujours de poussière, du gras des doigts ou d'une couche trop épaisse. Biscuit propre, mains propres."},
+    {t:"Alimentaire",d:"Pour un bol ou une tasse qui sert à manger, il faut un émail food-safe, bien vitrifié, sans craquelures à l'intérieur. Vérifie ce point avec qui cuit pour toi."}
   ]},
   {theme:"Cuisson grès et faïence",items:[
     {t:"Deux familles, deux températures",d:"La faïence cuit en basse température (autour de 1000 à 1080°C), le grès en haute température (autour de 1200 à 1280°C). Ton prestataire fixe le cône exact."},
-    {t:"Bien sec avant le biscuit",d:"Une pièce encore humide peut éclater au premier feu. Attends le séchage complet, terre claire et froide au toucher."},
+    {t:"Deux cuissons, pas une",d:"D'abord le biscuit, qui solidifie la pièce et la rend poreuse pour accrocher l'émail. Ensuite la cuisson d'émail. Ne saute pas le biscuit."},
+    {t:"On parle en cônes",d:"Les céramistes mesurent la cuisson en cônes, pas seulement en degrés. Le cône tient compte de la chaleur reçue dans le temps. Demande le cône visé à ton prestataire."},
+    {t:"Bien sec avant le feu",d:"Une pièce encore humide peut éclater au premier feu. Attends le séchage complet, terre claire et froide au toucher."},
+    {t:"Pas de bulle d'air",d:"Une bulle emprisonnée dans la terre fait éclater la pièce au four et peut abîmer les voisines. C'est pour ça que le malaxage en amont compte autant."},
+    {t:"Montée et refroidissement lents",d:"Les chocs thermiques fendent les pièces. Une chauffe trop rapide ou un four ouvert trop tôt fissure. Laisse le four redescendre seul."},
+    {t:"Une fournée, une température",d:"Ne mélange pas faïence et grès dans une cuisson prévue pour une seule température. Une faïence montée en température grès fond et coule."},
     {t:"Note ce qui part au four",d:"Avant de confier une fournée, photographie et note chaque pièce avec sa terre et son émail. Au retour, tu sais quoi reproduire."}
   ]}
 ];
@@ -285,9 +297,13 @@ function openDetail(id){
         <button class="btn dark" id="editPiece">Modifier la pièce</button>
       </div>`:""}`;
   if(mode==="atelier"){
-    document.getElementById("addStage").onclick=()=>openStageForm(p.id,null);
-    document.getElementById("editPiece").onclick=()=>openForm(p.id);
-    document.querySelectorAll(".edit-stage").forEach(b=>b.onclick=()=>openStageForm(b.dataset.pid,b.dataset.sid));
+    const body=document.getElementById("sbody");
+    body.onclick=ev=>{
+      const es=ev.target.closest(".edit-stage");
+      if(es){openStageForm(es.dataset.pid,es.dataset.sid);return;}
+      if(ev.target.closest("#addStage")){openStageForm(p.id,null);return;}
+      if(ev.target.closest("#editPiece")){openForm(p.id);return;}
+    };
   }
   showSheet();
 }
